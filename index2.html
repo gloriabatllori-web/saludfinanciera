@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salud Financiera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g900:#042E22;--g800:#085041;--g700:#0F6E56;--g500:#1D9E75;--g300:#6DCAAA;
+  --g200:#9FE1CB;--g100:#CBF0E3;--g50:#E8F7F2;--g25:#F3FAF7;
+  --warm:#FAFAF8;--warm2:#F5F3EF;--ink:#1C1C1A;--ink2:#4A4A46;--ink3:#7A7A74;--ink4:#ADADAA;
+  --border:#E2E8E4;--border2:#C8D8D2;
+  --amber:#F5A623;--amber-pale:#FEF6E8;--amber-dark:#7A4A00;
+  --blue:#2563EB;--blue-pale:#EFF6FF;
+  --p1:#2D5A8E;--p1-pale:#EBF2FA;  /* perfil 1 - azul */
+  --p2:#6B4F9E;--p2-pale:#F0EBF8;  /* perfil 2 - violeta */
+  --serif:'Fraunces',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;
+  --r:12px;--r-sm:8px;--r-lg:20px;
+  --sh:0 1px 3px rgba(4,46,34,.06),0 4px 16px rgba(4,46,34,.08);
+  --sh-lg:0 8px 32px rgba(4,46,34,.12),0 2px 8px rgba(4,46,34,.06);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--ink);background:var(--warm);line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased}
+button,input,textarea{font-family:var(--sans)}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:200;background:rgba(250,250,248,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1080px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:58px}
+.nav-logo{font-family:var(--serif);font-size:18px;font-weight:400;color:var(--g800);letter-spacing:-.01em;background:none;border:none;cursor:pointer;font-style:italic}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-link{font-size:13px;color:var(--ink2);padding:6px 14px;border-radius:20px;border:none;background:none;cursor:pointer;transition:all .15s}
+.nav-link:hover{background:var(--g25);color:var(--g700)}
+.nav-cta{background:var(--g800);color:#fff;padding:7px 18px;border-radius:20px;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:background .15s}
+.nav-cta:hover{background:var(--g700)}
+
+/* USER BAR */
+.ubar{display:none;background:var(--g800);padding:8px 0}
+.ubar.on{display:block}
+.ubar-inner{max-width:1080px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.ubar-left{font-size:13px;color:var(--g200)}
+.ubar-left strong{color:#fff}
+.ubar-right{display:flex;align-items:center;gap:12px}
+.ubar-badge{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:var(--g500);color:#fff}
+.ubar-logout{font-size:12px;color:var(--g200);background:none;border:none;cursor:pointer;text-decoration:underline}
+
+/* WRAP */
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.sec{padding:88px 0}
+.sec-warm{background:var(--warm2)}
+.sec-green{background:var(--g25)}
+.sec-dark{background:var(--g900)}
+
+/* HERO */
+.hero{padding:72px 0 64px;background:var(--warm)}
+.hero-eyebrow{font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--g500);margin-bottom:20px}
+.hero-title{font-family:var(--serif);font-size:clamp(38px,6vw,68px);font-weight:300;line-height:1.05;letter-spacing:-.03em;color:var(--ink);margin-bottom:28px;max-width:780px}
+.hero-title em{font-style:italic;color:var(--g700)}
+.hero-recognition{font-size:17px;color:var(--ink2);line-height:1.8;max-width:620px;margin-bottom:48px}
+.hero-recognition strong{color:var(--ink);font-weight:500}
+
+/* PERFIL CARDS */
+.perfiles{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:48px}
+.perfil-card{border-radius:var(--r-lg);padding:32px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.perfil-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+.perfil-1{background:var(--p1-pale);border:1.5px solid #BFCFE8}
+.perfil-1::before{background:var(--p1)}
+.perfil-1:hover{border-color:var(--p1);box-shadow:var(--sh)}
+.perfil-2{background:var(--p2-pale);border:1.5px solid #D4C8E8}
+.perfil-2::before{background:var(--p2)}
+.perfil-2:hover{border-color:var(--p2);box-shadow:var(--sh)}
+.perfil-icon{font-size:36px;margin-bottom:16px}
+.perfil-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.perfil-1 .perfil-label{color:var(--p1)}
+.perfil-2 .perfil-label{color:var(--p2)}
+.perfil-title{font-family:var(--serif);font-size:22px;font-weight:300;line-height:1.2;margin-bottom:10px;color:var(--ink)}
+.perfil-desc{font-size:14px;color:var(--ink2);line-height:1.6;margin-bottom:18px}
+.perfil-cta{font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px}
+.perfil-1 .perfil-cta{color:var(--p1)}
+.perfil-2 .perfil-cta{color:var(--p2)}
+
+/* HERO BOTTOM */
+.hero-bottom{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:var(--r);font-size:14px;font-weight:500;border:none;cursor:pointer;transition:all .18s;line-height:1}
+.btn-primary{background:var(--g800);color:#fff}
+.btn-primary:hover{background:var(--g700);transform:translateY(-1px);box-shadow:var(--sh)}
+.btn-ghost{background:transparent;color:var(--g800);border:1.5px solid var(--border2)}
+.btn-ghost:hover{border-color:var(--g500);background:var(--g25)}
+.hero-note{font-size:13px;color:var(--ink3)}
+
+/* RECONOCIMIENTO SECTION */
+.reconoc-inner{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.reconoc-text .tag{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g500);margin-bottom:16px}
+.reconoc-text h2{font-family:var(--serif);font-size:clamp(28px,4vw,42px);font-weight:300;line-height:1.15;letter-spacing:-.02em;margin-bottom:20px}
+.reconoc-text h2 em{font-style:italic;color:var(--g700)}
+.reconoc-text p{font-size:16px;color:var(--ink2);line-height:1.8;margin-bottom:16px}
+.reconoc-text p strong{color:var(--ink);font-weight:500}
+.reconoc-card{background:var(--g800);border-radius:var(--r-lg);padding:40px;color:#fff}
+.reconoc-card .rc-quote{font-family:var(--serif);font-size:22px;font-weight:300;font-style:italic;line-height:1.5;color:var(--g200);margin-bottom:24px}
+.reconoc-card .rc-items{display:flex;flex-direction:column;gap:14px}
+.reconoc-card .rc-item{display:flex;align-items:flex-start;gap:12px;font-size:14px;color:var(--g100);line-height:1.6}
+.reconoc-card .rc-dot{width:6px;height:6px;border-radius:50%;background:var(--g500);flex-shrink:0;margin-top:7px}
+
+/* PILARES */
+.pilares-intro{max-width:580px;margin-bottom:48px}
+.pilares-intro .tag{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g500);margin-bottom:14px}
+.pilares-intro h2{font-family:var(--serif);font-size:clamp(28px,4vw,42px);font-weight:300;line-height:1.15;letter-spacing:-.02em;margin-bottom:14px}
+.pilares-intro h2 em{font-style:italic;color:var(--g700)}
+.pilares-intro p{font-size:16px;color:var(--ink2);line-height:1.75}
+.pilares-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.pilar{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:28px 22px;transition:all .2s}
+.pilar:hover{border-color:var(--g300);box-shadow:var(--sh);transform:translateY(-2px)}
+.pilar.destacado{border-color:var(--g500);background:var(--g25)}
+.pilar-num{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--ink4);margin-bottom:12px}
+.pilar-icon{font-size:28px;margin-bottom:14px}
+.pilar-name{font-family:var(--serif);font-size:20px;font-weight:300;margin-bottom:6px;color:var(--ink)}
+.pilar.destacado .pilar-name{color:var(--g800)}
+.pilar-tag{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--g700);margin-bottom:10px;display:block}
+.pilar-desc{font-size:13px;color:var(--ink2);line-height:1.6}
+.pilar-badge{display:inline-block;margin-top:14px;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:var(--g100);color:var(--g700)}
+
+/* TEMAS */
+.temas-intro{margin-bottom:40px}
+.temas-intro .tag{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g500);margin-bottom:14px}
+.temas-intro h2{font-family:var(--serif);font-size:clamp(28px,4vw,42px);font-weight:300;line-height:1.15;letter-spacing:-.02em;margin-bottom:14px}
+.temas-intro h2 em{font-style:italic;color:var(--g700)}
+.temas-intro p{font-size:16px;color:var(--ink2);line-height:1.75;max-width:560px}
+.temas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.tema-btn{width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:0;cursor:pointer;transition:all .2s;overflow:hidden;position:relative}
+.tema-btn:hover{border-color:var(--g300);box-shadow:var(--sh)}
+.tema-btn.open{border-color:var(--g500)}
+.tema-btn::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:var(--g300);transition:background .2s}
+.tema-btn.open::before{background:var(--g500)}
+.tema-header{padding:28px}
+.tema-icon{font-size:28px;margin-bottom:14px}
+.tema-title{font-family:var(--serif);font-size:20px;font-weight:300;margin-bottom:8px;line-height:1.2;color:var(--ink)}
+.tema-desc{font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:16px}
+.tema-toggle{font-size:12px;font-weight:500;color:var(--g700);display:flex;align-items:center;gap:6px}
+.tema-toggle::after{content:'↓';transition:transform .2s;display:inline-block}
+.tema-btn.open .tema-toggle::after{transform:rotate(180deg)}
+.tema-body{display:none;padding:0 28px 28px;border-top:1px solid var(--border)}
+.tema-btn.open .tema-body{display:block}
+.tema-body ul{list-style:none;margin-top:16px}
+.tema-body li{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--ink2);line-height:1.6}
+.tema-body li:last-child{border-bottom:none}
+.tema-body .ri{font-size:15px;flex-shrink:0;margin-top:2px}
+.tema-body a{color:var(--g700);font-weight:500}
+.t-tag{font-size:10px;background:var(--g50);color:var(--g700);padding:2px 6px;border-radius:20px;margin-left:4px;white-space:nowrap}
+
+/* CURIOSIDADES */
+.curi-header{margin-bottom:28px}
+.curi-header .tag{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g500);margin-bottom:12px}
+.curi-header h3{font-family:var(--serif);font-size:28px;font-weight:300;letter-spacing:-.01em;margin-bottom:10px}
+.curi-header h3 em{font-style:italic;color:var(--g700)}
+.curi-intro-box{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:18px 22px;margin-bottom:24px}
+.curi-intro-box p{font-size:14px;color:var(--ink2);line-height:1.6}
+.curi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.curi-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-sm);padding:22px;transition:all .2s}
+.curi-card:hover{border-color:var(--g300);box-shadow:var(--sh)}
+.curi-card h4{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:8px}
+.curi-card p{font-size:13px;color:var(--ink2);line-height:1.6}
+.curi-tag{display:inline-block;margin-top:12px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink4)}
+
+/* SIMULADOR */
+.sim-intro{margin-bottom:36px}
+.sim-intro .tag{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g500);margin-bottom:14px}
+.sim-intro h2{font-family:var(--serif);font-size:clamp(28px,4vw,42px);font-weight:300;line-height:1.15;letter-spacing:-.02em;margin-bottom:12px}
+.sim-intro h2 em{font-style:italic;color:var(--g700)}
+.sim-intro p{font-size:16px;color:var(--ink2);line-height:1.75;max-width:560px}
+.sim-layout{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.sim-in{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:32px}
+.sim-outs{display:flex;flex-direction:column;gap:14px}
+.sim-out{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:24px}
+.sim-out.featured{border-color:var(--g500);background:var(--g25)}
+.sim-step-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.sim-step-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.sim-field{margin-bottom:22px}
+.sim-field:last-of-type{margin-bottom:0}
+.sim-field-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+.sim-field-top label{font-size:12px;font-weight:500;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em}
+.sim-field-top .val{font-size:16px;font-weight:600;color:var(--g800)}
+.sim-field input[type=range]{width:100%;accent-color:var(--g500);cursor:pointer}
+.sim-divider{height:1px;background:var(--border);margin:22px 0}
+.out-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--border)}
+.out-row:last-of-type{border-bottom:none}
+.out-row .ol{font-size:13px;color:var(--ink2)}
+.out-row .ov{font-size:14px;font-weight:600;color:var(--ink)}
+.out-big{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+.out-big .ol{font-size:14px;color:var(--g700);font-weight:500}
+.out-big .ov{font-family:var(--serif);font-size:38px;font-weight:300;color:var(--g800);letter-spacing:-.02em}
+.out-note{font-size:11px;color:var(--ink3);line-height:1.5;margin-top:14px}
+.sim-save{width:100%;margin-top:16px;padding:10px;background:var(--g800);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:500;cursor:pointer;display:none;transition:background .15s}
+.sim-save:hover{background:var(--g700)}
+.sim-save.on{display:block}
+.profile-widget{display:none;margin-top:28px;border:1.5px solid var(--g300);border-radius:var(--r);padding:28px;background:#fff}
+.profile-widget.on{display:block}
+.pw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.pw-card{background:var(--g25);border-radius:var(--r-sm);padding:16px}
+.pw-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.pw-val{font-family:var(--serif);font-size:26px;font-weight:300;color:var(--g800)}
+.pw-sub{font-size:11px;color:var(--ink3);margin-top:2px}
+
+/* SOCIAS */
+.gate{text-align:center;padding:56px 32px;background:#fff;border-radius:var(--r);border:1px solid var(--border)}
+.gate h3{font-family:var(--serif);font-size:28px;font-weight:300;margin-bottom:12px}
+.gate p{font-size:15px;color:var(--ink2);margin-bottom:24px;max-width:440px;margin-left:auto;margin-right:auto;line-height:1.75}
+.gate-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.socias-content{display:none}
+.socias-content.on{display:block}
+.socias-layout{display:grid;grid-template-columns:2fr 1fr;gap:28px}
+.socias-main h3{font-family:var(--serif);font-size:22px;font-weight:300;margin-bottom:16px}
+.session-list{display:flex;flex-direction:column;gap:14px}
+.session-item{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:22px;transition:all .2s}
+.session-item:hover{border-color:var(--g300);box-shadow:var(--sh)}
+.si-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:10px}
+.si-badge{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:4px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.badge-done{background:var(--g100);color:var(--g700)}
+.badge-active{background:var(--amber-pale);color:var(--amber-dark)}
+.badge-soon{background:#f0f0f0;color:#888}
+.si-title{font-family:var(--serif);font-size:19px;font-weight:300;margin-bottom:6px;line-height:1.2}
+.si-desc{font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:12px}
+.si-chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:11px;background:var(--g25);color:var(--g700);border:1px solid var(--g100);border-radius:20px;padding:3px 10px}
+.ex-title-sec{font-family:var(--serif);font-size:19px;font-weight:300;margin:28px 0 12px}
+.ex-item{background:var(--g25);border-radius:var(--r-sm);padding:14px 16px;border-left:3px solid var(--g500);margin-bottom:10px}
+.ex-ses{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--g700);margin-bottom:3px}
+.ex-name{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:3px}
+.ex-desc{font-size:12px;color:var(--ink2);line-height:1.5}
+.sidebar{display:flex;flex-direction:column;gap:16px}
+.s-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:20px}
+.s-card h4{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.s-card p{font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:12px}
+.wa-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 16px;background:#25D366;color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:500;cursor:pointer}
+.wa-btn:hover{background:#128C7E}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:11px 0;font-size:13px;font-weight:500;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.faq-q::after{content:'↓';font-size:11px;color:var(--ink3);transition:transform .2s;flex-shrink:0}
+.faq-item.open .faq-q::after{transform:rotate(180deg)}
+.faq-a{font-size:13px;color:var(--ink2);line-height:1.6;padding-bottom:12px;display:none}
+.faq-item.open .faq-a{display:block}
+.res-list{list-style:none}
+.res-list li{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--ink2)}
+.res-list li:last-child{border-bottom:none}
+.res-list a{color:var(--g700);font-weight:500}
+.res-tag{font-size:10px;background:var(--g50);color:var(--g700);padding:2px 6px;border-radius:20px;margin-left:4px}
+
+/* PRIVADA */
+.priv-gate{text-align:center;padding:56px 32px;background:#fff;border-radius:var(--r);border:1px solid var(--border)}
+.priv-gate h3{font-family:var(--serif);font-size:28px;font-weight:300;margin-bottom:12px}
+.priv-gate p{font-size:15px;color:var(--ink2);margin-bottom:8px;max-width:440px;margin-left:auto;margin-right:auto;line-height:1.75}
+.code-row{display:flex;gap:8px;justify-content:center;max-width:320px;margin:20px auto 0}
+.code-row input{flex:1;padding:10px 14px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:14px;outline:none;text-transform:uppercase;letter-spacing:.1em;transition:border .15s;color:var(--ink)}
+.code-row input:focus{border-color:var(--g500)}
+.code-row button{padding:10px 18px;background:var(--g800);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:500;cursor:pointer}
+.priv-err{font-size:12px;color:#C0392B;margin-top:10px;display:none;text-align:center}
+.priv-content{display:none}
+.priv-content.on{display:block}
+.priv-banner{background:var(--g800);border-radius:var(--r);padding:28px 32px;margin-bottom:24px;display:flex;align-items:flex-start;gap:20px}
+.priv-banner .pb-icon{font-size:36px;flex-shrink:0}
+.priv-banner h3{font-family:var(--serif);font-size:22px;font-weight:300;color:#fff;margin-bottom:6px}
+.priv-banner p{font-size:14px;color:var(--g200);line-height:1.6}
+.priv-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.priv-area{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:28px}
+.priv-area h4{font-family:var(--serif);font-size:20px;font-weight:300;margin-bottom:8px}
+.priv-area p{font-size:13px;color:var(--ink2);margin-bottom:14px;line-height:1.6}
+.priv-area textarea{width:100%;border:1.5px solid var(--border2);border-radius:var(--r-sm);padding:12px 14px;font-size:13px;min-height:120px;resize:vertical;outline:none;transition:border .15s;line-height:1.6;color:var(--ink)}
+.priv-area textarea:focus{border-color:var(--g500)}
+.priv-save{margin-top:10px;padding:9px 20px;background:var(--g800);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:500;cursor:pointer}
+.priv-historial{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:28px;margin-top:20px}
+.priv-historial h4{font-family:var(--serif);font-size:20px;font-weight:300;margin-bottom:6px}
+.priv-historial p{font-size:13px;color:var(--ink2);margin-bottom:16px}
+.reflex-entry{margin-bottom:12px;padding:12px 14px;background:var(--g25);border-radius:var(--r-sm);border-left:3px solid var(--g300)}
+.reflex-date{font-size:11px;color:var(--ink3);margin-bottom:4px}
+.reflex-text{font-size:13px;color:var(--ink2);line-height:1.6}
+
+/* AUTH MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(4,46,34,.45);z-index:300;align-items:center;justify-content:center;padding:24px}
+.overlay.on{display:flex}
+.modal{background:#fff;border-radius:var(--r-lg);padding:40px;width:100%;max-width:420px;box-shadow:var(--sh-lg);position:relative;max-height:90vh;overflow-y:auto}
+.modal-x{position:absolute;top:16px;right:16px;border:none;background:none;font-size:20px;color:var(--ink3);cursor:pointer;line-height:1;padding:4px}
+.modal-title{font-family:var(--serif);font-size:26px;font-weight:300;margin-bottom:6px;letter-spacing:-.01em}
+.modal-desc{font-size:14px;color:var(--ink2);margin-bottom:24px;line-height:1.6}
+.auth-tabs{display:flex;border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;margin-bottom:22px}
+.auth-tab{flex:1;padding:9px;font-size:13px;font-weight:500;border:none;background:#fff;color:var(--ink2);cursor:pointer;transition:all .15s}
+.auth-tab.on{background:var(--g800);color:#fff}
+.auth-form{display:none}
+.auth-form.on{display:block}
+.f-field{margin-bottom:14px}
+.f-field label{display:block;font-size:12px;font-weight:500;color:var(--ink2);margin-bottom:5px}
+.f-field input{width:100%;padding:10px 13px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:14px;outline:none;transition:border .15s;color:var(--ink)}
+.f-field input:focus{border-color:var(--g500)}
+.f-submit{width:100%;padding:12px;background:var(--g800);color:#fff;border:none;border-radius:var(--r-sm);font-size:14px;font-weight:500;cursor:pointer;margin-top:4px;transition:background .15s}
+.f-submit:hover{background:var(--g700)}
+.f-err{font-size:12px;color:#C0392B;margin-top:8px;display:none}
+.f-err.on{display:block}
+
+/* FOOTER */
+.footer{background:var(--g900);padding:56px 0 32px}
+.footer-inner{display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.footer-brand{font-family:var(--serif);font-size:22px;font-weight:300;font-style:italic;color:#fff;margin-bottom:12px}
+.footer-tagline{font-size:13px;color:var(--g200);line-height:1.75;max-width:280px}
+.footer-col h4{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g300);margin-bottom:14px}
+.footer-col ul{list-style:none}
+.footer-col li{margin-bottom:8px}
+.footer-col button{font-size:13px;color:var(--g200);background:none;border:none;cursor:pointer;transition:color .15s;padding:0}
+.footer-col button:hover{color:#fff}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:22px;display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,.28)}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;background:var(--g800);color:#fff;padding:12px 20px;border-radius:var(--r-sm);font-size:13px;box-shadow:var(--sh-lg);z-index:400;transform:translateY(16px);opacity:0;transition:all .28s;pointer-events:none}
+.toast.on{transform:translateY(0);opacity:1}
+
+/* SCROLL HINT */
+.scroll-hint{text-align:center;padding:20px 0 48px;color:var(--ink3);font-size:13px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.scroll-arrow{width:20px;height:20px;border-right:1.5px solid var(--ink4);border-bottom:1.5px solid var(--ink4);transform:rotate(45deg);animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(5px)}}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .perfiles,.reconoc-inner,.pilares-grid,.temas-grid,.sim-layout,.socias-layout,.curi-grid,.footer-inner,.priv-grid{grid-template-columns:1fr;gap:20px}
+  .pilares-grid{grid-template-columns:1fr 1fr}
+  .sec{padding:60px 0}
+  .hero{padding:48px 0 40px}
+}
+@media(max-width:600px){
+  .pilares-grid,.pw-grid{grid-template-columns:1fr 1fr}
+  .curi-grid{grid-template-columns:1fr}
+  .nav-link{display:none}
+  .hero-title{font-size:36px}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- USER BAR -->
+<div class="ubar" id="ubar">
+  <div class="ubar-inner">
+    <span class="ubar-left">Hola, <strong id="ubarName">–</strong></span>
+    <div class="ubar-right">
+      <span class="ubar-badge" id="ubarBadge">Socia</span>
+      <button class="ubar-logout" onclick="doLogout()">Cerrar sesión</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <button class="nav-logo" onclick="window.scrollTo({top:0,behavior:'smooth'})">Salud Financiera</button>
+    <div class="nav-links">
+      <button class="nav-link" onclick="goTo('sec-pilares')">Los pilares</button>
+      <button class="nav-link" onclick="goTo('sec-temas')">Temas</button>
+      <button class="nav-link" onclick="goTo('sec-sim')">Simulador</button>
+      <button class="nav-link" onclick="goTo('sec-socias')">Socias</button>
+      <button class="nav-cta" id="navCta" onclick="openAuth('register')">Unirme</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-eyebrow">Educación financiera · Para mujeres que gestionan vidas complejas</div>
+    <h1 class="hero-title">No es que no hayas querido<br>ocuparte de tu dinero.<br><em>Es que has estado ocupándote<br>de todo lo demás.</em></h1>
+    <p class="hero-recognition">Mujeres con vidas de alta competencia — hijos, familia, trabajo, el dinero de todos menos el nuestro. No hay nada de lo que avergonzarse. <strong>Hoy es un buen momento para empezar.</strong></p>
+
+    <!-- DOS PERFILES -->
+    <div class="perfiles">
+      <div class="perfil-card perfil-1" onclick="goTo('sec-sim')">
+        <div class="perfil-icon">💎</div>
+        <div class="perfil-label">Perfil 1</div>
+        <h3 class="perfil-title">Tengo ahorros pero no sé qué hacer con ellos</h3>
+        <p class="perfil-desc">Tu dinero está parado en una cuenta o en productos del banco que no sabes si son los mejores. Quieres que trabaje más.</p>
+        <span class="perfil-cta">Ver cómo hacer crecer tu patrimonio →</span>
+      </div>
+      <div class="perfil-card perfil-2" onclick="goTo('sec-sim')">
+        <div class="perfil-icon">🎯</div>
+        <div class="perfil-label">Perfil 2</div>
+        <h3 class="perfil-title">Tengo un gap y necesito generar capital</h3>
+        <p class="perfil-desc">Cuando calculas lo que necesitarás en la jubilación y lo que tendrás, hay una diferencia. Necesitas un plan para cubrirla.</p>
+        <span class="perfil-cta">Calcular tu gap y tu objetivo →</span>
+      </div>
+    </div>
+
+    <div class="hero-bottom">
+      <button class="btn btn-primary" onclick="goTo('sec-pilares')">Empezar por el principio</button>
+      <button class="btn btn-ghost" onclick="openAuth('register')">Unirme al taller</button>
+      <span class="hero-note">Sin asesoramiento financiero — solo criterio y herramientas</span>
+    </div>
+  </div>
+</section>
+
+<div class="scroll-hint"><span>Sigue leyendo</span><div class="scroll-arrow"></div></div>
+
+<!-- RECONOCIMIENTO -->
+<section class="sec sec-warm" id="sec-reconoc">
+  <div class="wrap">
+    <div class="reconoc-inner">
+      <div class="reconoc-text">
+        <div class="tag">Por qué este taller</div>
+        <h2>No te falta<br><em>voluntad.</em><br>Te falta el mapa.</h2>
+        <p>Nadie nos enseñó educación financiera porque no se enseñaba. Y cuando intentas aprender, te encuentras con demasiada información, demasiados productos, demasiados influencers de finanzas — y ninguno que hable <strong>desde tu situación real.</strong></p>
+        <p>Este taller no es un curso de inversión. Es el paso previo que nadie da: entender tu situación completa antes de elegir nada. La inversión es una consecuencia, no el punto de partida.</p>
+      </div>
+      <div class="reconoc-card">
+        <p class="rc-quote">"La sesión me abrió los ojos. Por primera vez tengo ganas de ocuparme de mi salud financiera."</p>
+        <div class="rc-items">
+          <div class="rc-item"><div class="rc-dot"></div><span>Formato presencial, en casa, ambiente de confianza</span></div>
+          <div class="rc-item"><div class="rc-dot"></div><span>Sin tecnicismos, sin juicios, sin productos que vender</span></div>
+          <div class="rc-item"><div class="rc-dot"></div><span>Cada una sale con su número y su primer paso concreto</span></div>
+          <div class="rc-item"><div class="rc-dot"></div><span>Comunidad de mujeres en la misma situación</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOS 4 PILARES -->
+<section class="sec" id="sec-pilares">
+  <div class="wrap">
+    <div class="pilares-intro">
+      <div class="tag">El marco</div>
+      <h2>Invertir es el cuarto pilar,<br><em>no el primero</em></h2>
+      <p>Antes de elegir un producto, necesitas entender los cuatro. Si los pilares 1 y 2 no están en orden, el pilar 4 no funciona.</p>
+    </div>
+    <div class="pilares-grid">
+      <div class="pilar">
+        <div class="pilar-num">01</div>
+        <div class="pilar-icon">💧</div>
+        <span class="pilar-tag">AHORRO</span>
+        <div class="pilar-name">Flujo</div>
+        <p class="pilar-desc">¿Entra más de lo que sale? Sin control del flujo, cualquier inversión es construir sobre arena.</p>
+      </div>
+      <div class="pilar">
+        <div class="pilar-num">02</div>
+        <div class="pilar-icon">🛡️</div>
+        <span class="pilar-tag">IMPREVISTOS</span>
+        <div class="pilar-name">Colchón</div>
+        <p class="pilar-desc">¿Tienes protección ante imprevistos? Sin colchón, cualquier emergencia te obliga a vender en el peor momento.</p>
+      </div>
+      <div class="pilar">
+        <div class="pilar-num">03</div>
+        <div class="pilar-icon">🧭</div>
+        <span class="pilar-tag">FUTURO</span>
+        <div class="pilar-name">Proyección</div>
+        <p class="pilar-desc">¿Sabes a dónde vas? El gap de jubilación es el número que lo cambia todo.</p>
+      </div>
+      <div class="pilar destacado">
+        <div class="pilar-num">04</div>
+        <div class="pilar-icon">🌱</div>
+        <span class="pilar-tag">INVERSIÓN</span>
+        <div class="pilar-name">Crecimiento</div>
+        <p class="pilar-desc">¿Tu dinero trabaja para ti? Aquí es donde entra la inversión — el cuarto pilar, no el primero.</p>
+        <span class="pilar-badge">Empieza aquí solo si el 1, 2 y 3 están cubiertos</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEMAS -->
+<section class="sec sec-green" id="sec-temas">
+  <div class="wrap">
+    <div class="temas-intro">
+      <div class="tag">Contenido libre</div>
+      <h2>Tres preguntas.<br><em>Respuesta clara.</em></h2>
+      <p>No otro catálogo de finanzas. Las preguntas que más paralizan, con la respuesta más honesta. Haz clic para abrir cada una.</p>
+    </div>
+    <div class="temas-grid">
+      <button class="tema-btn" id="t0">
+        <div class="tema-header">
+          <div class="tema-icon">🕐</div>
+          <div class="tema-title">¿Estoy a tiempo?</div>
+          <p class="tema-desc">La pregunta que más paraliza — y cuya respuesta siempre es sí, pero el margen importa.</p>
+          <span class="tema-toggle">Ver respuesta</span>
+        </div>
+        <div class="tema-body">
+          <ul>
+            <li><span class="ri">📊</span><div>Usa el simulador de esta página para ver tu gap en 2 minutos. <span class="t-tag">Simulador</span></div></li>
+            <li><span class="ri">📖</span><div>La pensión pública cubre entre el 60–70% del último salario en el mejor caso. Calcula la tuya en la <a href="https://sede.seg-social.gob.es" target="_blank" onclick="event.stopPropagation()">calculadora de la Seguridad Social</a>. <span class="t-tag">Oficial</span></div></li>
+            <li><span class="ri">💡</span><div>Empezar con 200€/mes hoy es mejor que esperar 5 años para empezar con 400€/mes. El tiempo es la variable que no puedes recuperar.</div></li>
+          </ul>
+        </div>
+      </button>
+      <button class="tema-btn" id="t1">
+        <div class="tema-header">
+          <div class="tema-icon">💰</div>
+          <div class="tema-title">¿Qué es invertir, exactamente?</div>
+          <p class="tema-desc">Sin jerga. La diferencia entre ahorrar e invertir, y por qué tener el dinero parado no es neutral.</p>
+          <span class="tema-toggle">Ver respuesta</span>
+        </div>
+        <div class="tema-body">
+          <ul>
+            <li><span class="ri">💡</span><div>Ahorrar es guardar dinero. Invertir es poner ese dinero a trabajar para que genere más. La diferencia, a 20 años, puede ser de cientos de miles de euros.</div></li>
+            <li><span class="ri">📊</span><div>200.000€ en cuenta corriente al 0% generan 0€/año. Los mismos 200.000€ en una cartera diversificada al 6% generan ~12.000€/año. <strong>El coste de no hacer nada es real.</strong></div></li>
+            <li><span class="ri">📖</span><div>La inflación hace que el dinero parado pierda valor cada año. Guardar no es una posición neutral — es perder lentamente.</div></li>
+          </ul>
+        </div>
+      </button>
+      <button class="tema-btn" id="t2">
+        <div class="tema-header">
+          <div class="tema-icon">🗺️</div>
+          <div class="tema-title">¿Por dónde empiezo?</div>
+          <p class="tema-desc">El primer paso concreto — no diez opciones, una, con el criterio para elegirla.</p>
+          <span class="tema-toggle">Ver respuesta</span>
+        </div>
+        <div class="tema-body">
+          <ul>
+            <li><span class="ri">1️⃣</span><div><strong>Conoce tu número:</strong> usa el simulador para saber cuánto necesitas generar al año.</div></li>
+            <li><span class="ri">2️⃣</span><div><strong>Entiende tu perfil:</strong> ¿cuántos años tienes antes de necesitar el dinero? ¿Puedes ver tu cartera bajar un 20% sin vender?</div></li>
+            <li><span class="ri">3️⃣</span><div><strong>Construye una cartera diversificada:</strong> no hace falta elegir acciones ni hacer trading. Una cartera sencilla, diversificada y de bajo coste es suficiente para la gran mayoría.</div></li>
+          </ul>
+        </div>
+      </button>
+    </div>
+
+    <!-- CURIOSIDADES -->
+    <div style="margin-top:64px">
+      <div class="curi-header">
+        <div class="tag">Para quien quiere profundizar</div>
+        <h3>Curiosidades — <em>el nivel siguiente</em></h3>
+      </div>
+      <div class="curi-intro-box"><p>Si ya tienes claro lo básico y quieres saber más, aquí están los temas que suelen aparecer cuando empiezas a investigar. Ve al que te genere más dudas ahora mismo.</p></div>
+      <div class="curi-grid">
+        <div class="curi-card"><h4>Fondos indexados vs. ETFs</h4><p>Se parecen mucho pero tienen una diferencia clave: los fondos permiten traspasar sin tributar, los ETFs no. A largo plazo puede suponer miles de euros.</p><span class="curi-tag">Inversión · Fiscalidad</span></div>
+        <div class="curi-card"><h4>¿Qué es el TER y por qué importa?</h4><p>El TER es la comisión anual del fondo. Un 2% parece poco — pero a 20 años puede costarte el 30–40% de tu rentabilidad final.</p><span class="curi-tag">Comisiones</span></div>
+        <div class="curi-card"><h4>Planes de pensiones: ¿sí o no?</h4><p>Tienen ventaja fiscal de entrada pero tributación de salida como renta del trabajo. Tienen sentido si hoy estás en un tramo alto y esperas estar en uno más bajo al jubilarte.</p><span class="curi-tag">Fiscalidad · Jubilación</span></div>
+        <div class="curi-card"><h4>La aportación periódica: por qué funciona</h4><p>Invertir 200€/mes en lugar de 2.400€ de golpe te protege del mal timing. Compras en momentos altos y bajos — el precio medio trabaja a tu favor.</p><span class="curi-tag">Estrategia</span></div>
+        <div class="curi-card"><h4>¿Cuándo pago impuestos?</h4><p>Solo cuando vendes. Mientras mantienes, aunque haya subido un 50%, no hay evento fiscal. Las ganancias tributan en la base del ahorro, a tipos más bajos que tu sueldo.</p><span class="curi-tag">Fiscalidad</span></div>
+        <div class="curi-card"><h4>Robo-advisors: la opción sin decisiones</h4><p>Carteras diversificadas gestionadas automáticamente según tu perfil. Coste total ~0,5–0,7%. Ideales para quien quiere empezar sin tener que elegir cada fondo.</p><span class="curi-tag">Plataformas</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIMULADOR -->
+<section class="sec" id="sec-sim">
+  <div class="wrap">
+    <div class="sim-intro">
+      <div class="tag">Herramientas</div>
+      <h2>Tu simulador —<br><em>en tiempo real</em></h2>
+      <p>Ajusta los deslizadores y los resultados se calculan al instante. Libre para todas, sin registro.</p>
+    </div>
+    <div class="sim-layout">
+      <div class="sim-in">
+        <div class="sim-step-label">Paso 1 · Tu situación mensual</div>
+        <div class="sim-field">
+          <div class="sim-field-top"><label>Gastos en jubilación</label><span class="val" id="sGV">2.000 €</span></div>
+          <input type="range" id="sG" min="800" max="6000" step="100" value="2000" oninput="simCalc()">
+        </div>
+        <div class="sim-field">
+          <div class="sim-field-top"><label>Pensión pública estimada</label><span class="val" id="sPV">1.200 €</span></div>
+          <input type="range" id="sP" min="400" max="3500" step="50" value="1200" oninput="simCalc()">
+        </div>
+        <div class="sim-field">
+          <div class="sim-field-top"><label>Otros ingresos mensuales</label><span class="val" id="sOV">300 €</span></div>
+          <input type="range" id="sO" min="0" max="3000" step="50" value="300" oninput="simCalc()">
+        </div>
+        <div class="sim-divider"></div>
+        <div class="sim-step-label">Paso 2 · Tu horizonte y capital</div>
+        <div class="sim-field">
+          <div class="sim-field-top"><label>Años hasta la jubilación</label><span class="val" id="sAV">15 años</span></div>
+          <input type="range" id="sA" min="1" max="35" step="1" value="15" oninput="simCalc()">
+        </div>
+        <div class="sim-field">
+          <div class="sim-field-top"><label>Capital ya acumulado</label><span class="val" id="sKV">0 €</span></div>
+          <input type="range" id="sK" min="0" max="500000" step="5000" value="0" oninput="simCalc()">
+        </div>
+        <div class="sim-divider"></div>
+        <div class="sim-step-label">Paso 3 · Rentabilidad esperada</div>
+        <div class="sim-field">
+          <div class="sim-field-top"><label>Rentabilidad anual</label><span class="val" id="sRV">6%</span></div>
+          <input type="range" id="sR" min="1" max="9" step="0.5" value="6" oninput="simCalc()">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);margin-top:5px">
+            <span>🔵 Conservador (3%)</span><span>🟢 Moderado (5–6%)</span><span>🔴 Crecimiento (8%+)</span>
+          </div>
+        </div>
+      </div>
+      <div class="sim-outs">
+        <div class="sim-out">
+          <div class="sim-step-label">Tu gap</div>
+          <div class="out-big"><span class="ol">Gap mensual</span><span class="ov" id="rGap">500 €</span></div>
+          <div class="out-row"><span class="ol">Total ingresos/mes</span><span class="ov" id="rIng">1.500 €</span></div>
+          <div class="out-row"><span class="ol">Gap anual</span><span class="ov" id="rGapA">6.000 €</span></div>
+          <div class="out-row"><span class="ol">Objetivo anual (÷0,80 fiscal)</span><span class="ov" id="rObj">7.500 €</span></div>
+        </div>
+        <div class="sim-out">
+          <div class="sim-step-label">Capital necesario</div>
+          <div class="out-row"><span class="ol">Capital al <span id="rRl">6%</span></span><span class="ov" id="rCap">125.000 €</span></div>
+          <div class="out-row"><span class="ol">Ya acumulado</span><span class="ov" id="rAcu">0 €</span></div>
+          <div class="out-row"><span class="ol">Pendiente de acumular</span><span class="ov" id="rPen">125.000 €</span></div>
+        </div>
+        <div class="sim-out featured">
+          <div class="sim-step-label">Tu aportación mensual</div>
+          <div class="out-big"><span class="ol">Aportación mensual</span><span class="ov" id="rAp">344 €</span></div>
+          <div class="out-row"><span class="ol">Total que aportarás</span><span class="ov" id="rTA">62.000 €</span></div>
+          <div class="out-row"><span class="ol">Lo genera el mercado por ti</span><span class="ov" id="rMer">63.000 €</span></div>
+          <div style="margin-top:14px;background:var(--g100);border-radius:var(--r-sm);padding:10px 13px">
+            <p style="font-size:13px;color:var(--g700);line-height:1.5">El <strong style="color:var(--g800)" id="rPct">50%</strong> del capital lo genera el mercado — sin esfuerzo adicional tuyo.</p>
+          </div>
+          <button class="sim-save" id="simSave" onclick="simSaveData()">Guardar mis números →</button>
+        </div>
+        <p class="out-note">Cálculo orientativo. Rentabilidades históricas, no garantizadas. No constituye asesoramiento financiero.</p>
+      </div>
+    </div>
+    <div class="profile-widget" id="profileWidget">
+      <div style="font-family:var(--serif);font-size:20px;font-weight:300;margin-bottom:4px">Mis números guardados</div>
+      <p style="font-size:13px;color:var(--ink2)">Actualiza los deslizadores arriba y guarda tu situación.</p>
+      <div class="pw-grid">
+        <div class="pw-card"><div class="pw-label">Gap mensual</div><div class="pw-val" id="pwG">–</div><div class="pw-sub">€/mes</div></div>
+        <div class="pw-card"><div class="pw-label">Capital objetivo</div><div class="pw-val" id="pwC">–</div><div class="pw-sub">€</div></div>
+        <div class="pw-card"><div class="pw-label">Aportación mensual</div><div class="pw-val" id="pwA">–</div><div class="pw-sub">€/mes</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAS -->
+<section class="sec sec-warm" id="sec-socias">
+  <div class="wrap">
+    <div style="margin-bottom:32px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g500);margin-bottom:14px">Zona de socias</div>
+      <h2 style="font-family:var(--serif);font-size:clamp(28px,4vw,42px);font-weight:300;line-height:1.15;letter-spacing:-.02em;margin-bottom:14px">El taller y la <em style="font-style:italic;color:var(--g700)">comunidad</em></h2>
+      <p style="font-size:16px;color:var(--ink2);line-height:1.75;max-width:560px">Para las que han asistido al taller presencial. Aquí están las sesiones, los materiales, los ejercicios y el grupo.</p>
+    </div>
+
+    <div class="gate" id="sociasGate">
+      <h3>Contenido para participantes</h3>
+      <p>Regístrate con tu email para acceder a las sesiones, los ejercicios y la comunidad del taller.</p>
+      <div class="gate-btns">
+        <button class="btn btn-primary" onclick="openAuth('register')">Crear cuenta gratuita</button>
+        <button class="btn btn-ghost" onclick="openAuth('login')">Ya tengo cuenta</button>
+      </div>
+    </div>
+
+    <div class="socias-content" id="sociasContent">
+      <div class="socias-layout">
+        <div class="socias-main">
+          <h3>Sesiones</h3>
+          <div class="session-list">
+            <div class="session-item">
+              <div class="si-top">
+                <div><div class="si-title">Salud financiera: el punto de partida</div><p class="si-desc">Los 4 pilares, el gap de jubilación, arquetipos de dinero y tu primera hoja de ruta.</p></div>
+                <span class="si-badge badge-done">Completada</span>
+              </div>
+              <div class="si-chips"><span class="chip">Tabla del gap</span><span class="chip">4 pilares</span><span class="chip">Arquetipos</span></div>
+            </div>
+            <div class="session-item">
+              <div class="si-top">
+                <div><div class="si-title">Cómo construir una cartera diversificada</div><p class="si-desc">Para el perfil 1 y el perfil 2: cómo hacer crecer y preservar el capital. Marco de productos, perfil de riesgo y demo práctica.</p></div>
+                <span class="si-badge badge-active">Próxima</span>
+              </div>
+              <div class="si-chips"><span class="chip">Handout A</span><span class="chip">Handout B</span><span class="chip">Handout C</span><span class="chip">Handout D</span><span class="chip">Handout E</span></div>
+            </div>
+          </div>
+
+          <div class="ex-title-sec">Ejercicios entre sesiones</div>
+          <div class="ex-item">
+            <div class="ex-ses">Sesión 1</div>
+            <div class="ex-name">Tu número de esta semana</div>
+            <p class="ex-desc">Calcula tu pensión estimada en la calculadora de la Seguridad Social y anota el resultado.</p>
+          </div>
+          <div class="ex-item">
+            <div class="ex-ses">Sesión 1</div>
+            <div class="ex-name">Anota cuánto tienes ahorrado en total</div>
+            <p class="ex-desc">Cuentas, planes de pensiones, fondos, lo que sea. Ese es tu punto de partida real.</p>
+          </div>
+        </div>
+
+        <div class="sidebar">
+          <div class="s-card">
+            <h4>💬 Grupo de WhatsApp</h4>
+            <p>Aquí seguimos la conversación entre sesiones. Preguntas, lo que encontráis, dudas del día a día.</p>
+            <button class="wa-btn" onclick="toast('El enlace lo comparte Gloria directamente 🌿')">📱 Unirme al grupo</button>
+          </div>
+          <div class="s-card">
+            <h4>❓ Preguntas frecuentes</h4>
+            <div>
+              <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">¿Necesito experiencia previa?</button>
+                <p class="faq-a">No. El taller está diseñado para personas inteligentes sin exposición previa a las finanzas. Empezamos desde cero.</p>
+              </div>
+              <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">¿Es asesoramiento financiero?</button>
+                <p class="faq-a">No. Es educación financiera. Aprendemos criterios para que cada una pueda tomar sus propias decisiones. No se recomienda ningún producto concreto.</p>
+              </div>
+              <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">¿Con cuánto dinero puedo empezar?</button>
+                <p class="faq-a">Con lo que te sea cómodo. Hay fondos indexados desde 1€ de inversión mínima. Lo más importante es la constancia, no la cantidad inicial.</p>
+              </div>
+              <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">¿Cuándo es la siguiente sesión?</button>
+                <p class="faq-a">Las fechas se anuncian por el grupo de WhatsApp con suficiente antelación.</p>
+              </div>
+            </div>
+          </div>
+          <div class="s-card">
+            <h4>📚 Recursos recomendados</h4>
+            <ul class="res-list">
+              <li>🔗 <a href="https://sede.seg-social.gob.es" target="_blank">Calculadora de pensión</a> — Seg. Social <span class="res-tag">Oficial</span></li>
+              <li>🔗 <a href="https://www.myinvestor.es" target="_blank">MyInvestor</a> — Plataforma de la demo <span class="res-tag">Plataforma</span></li>
+              <li>🔗 <a href="https://indexacapital.com" target="_blank">Indexa Capital</a> — Robo-advisor español <span class="res-tag">Plataforma</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ZONA PRIVADA -->
+<section class="sec" id="sec-privada">
+  <div class="wrap">
+    <div style="margin-bottom:32px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g500);margin-bottom:14px">Zona privada</div>
+      <h2 style="font-family:var(--serif);font-size:clamp(28px,4vw,42px);font-weight:300;line-height:1.15;letter-spacing:-.02em;margin-bottom:14px">Tu espacio <em style="font-style:italic;color:var(--g700)">individual</em></h2>
+      <p style="font-size:16px;color:var(--ink2);line-height:1.75;max-width:560px">Un espacio solo tuyo para reflexionar, hacer seguimiento de tu evolución y consultarle a Gloria lo que necesites.</p>
+    </div>
+
+    <div class="priv-gate" id="privGate">
+      <h3>Acceso con código personal</h3>
+      <p>Gloria te da tu código personalmente — es tuyo y solo tuyo.</p>
+      <p style="font-size:13px;color:var(--ink3)">Cada participante tiene un código distinto.</p>
+      <div class="code-row">
+        <input type="text" id="privCode" placeholder="TU-CÓDIGO" maxlength="20">
+        <button onclick="activarCodigo()">Activar</button>
+      </div>
+      <p class="priv-err" id="privErr">Código no válido. Contacta con Gloria.</p>
+    </div>
+
+    <div class="priv-content" id="privContent">
+      <div class="priv-banner">
+        <span class="pb-icon">🌿</span>
+        <div>
+          <h3>Tu espacio personal</h3>
+          <p>Reflexiones, seguimiento de tu evolución y preguntas directas a Gloria. Solo tú tienes acceso aquí.</p>
+        </div>
+      </div>
+      <div class="priv-grid">
+        <div class="priv-area">
+          <h4>Mi reflexión de esta semana</h4>
+          <p>¿Qué has aprendido? ¿Qué te ha sorprendido? ¿Qué sigues sin tener claro?</p>
+          <textarea id="reflexText" placeholder="Escribe aquí libremente..."></textarea>
+          <button class="priv-save" onclick="saveReflex()">Guardar reflexión</button>
+        </div>
+        <div class="priv-area">
+          <h4>Pregunta para Gloria</h4>
+          <p>Algo de tu situación concreta que quieras consultar en el contexto del taller.</p>
+          <textarea id="pregText" placeholder="Tu pregunta..."></textarea>
+          <button class="priv-save" onclick="savePregunta()">Enviar pregunta</button>
+        </div>
+      </div>
+      <div class="priv-historial">
+        <h4>Mi historial</h4>
+        <p>Todo lo que has ido anotando a lo largo del taller.</p>
+        <div id="reflexList" style="font-size:13px;color:var(--ink3);font-style:italic">Todavía no has guardado ninguna reflexión.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Salud Financiera</div>
+        <p class="footer-tagline">Para mujeres con vidas complejas que quieren ocuparse de su dinero — sin que nadie les venda nada.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Contenido</h4>
+        <ul>
+          <li><button onclick="goTo('sec-pilares')">Los 4 pilares</button></li>
+          <li><button onclick="goTo('sec-temas')">Temas</button></li>
+          <li><button onclick="goTo('sec-sim')">Simulador</button></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Acceso</h4>
+        <ul>
+          <li><button onclick="openAuth('register')">Crear cuenta</button></li>
+          <li><button onclick="openAuth('login')">Iniciar sesión</button></li>
+          <li><button onclick="goTo('sec-privada')">Zona privada</button></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>Educación financiera. No constituye asesoramiento financiero personalizado.</span>
+      <span>Salud Financiera · 2026</span>
+    </div>
+  </div>
+</footer>
+
+<!-- AUTH MODAL -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <button class="modal-x" onclick="closeAuth()">✕</button>
+    <h2 class="modal-title">Bienvenida</h2>
+    <p class="modal-desc">Regístrate con tu email para guardar tus números y acceder al contenido de socias.</p>
+    <div class="auth-tabs">
+      <button class="auth-tab on" id="tabR" onclick="switchAuth('register')">Crear cuenta</button>
+      <button class="auth-tab" id="tabL" onclick="switchAuth('login')">Ya tengo cuenta</button>
+    </div>
+    <div class="auth-form on" id="fR">
+      <div class="f-field"><label>Tu nombre</label><input type="text" id="rName" placeholder="¿Cómo te llamamos?"></div>
+      <div class="f-field"><label>Correo electrónico</label><input type="email" id="rEmail" placeholder="tu@email.com"></div>
+      <div class="f-field"><label>Contraseña</label><input type="password" id="rPass" placeholder="Mínimo 6 caracteres"></div>
+      <p class="f-err" id="rErr">Revisa los datos e inténtalo de nuevo.</p>
+      <button class="f-submit" onclick="doRegister()">Crear cuenta gratuita</button>
+    </div>
+    <div class="auth-form" id="fL">
+      <div class="f-field"><label>Correo electrónico</label><input type="email" id="lEmail" placeholder="tu@email.com"></div>
+      <div class="f-field"><label>Contraseña</label><input type="password" id="lPass" placeholder="Tu contraseña"></div>
+      <p class="f-err" id="lErr">Correo o contraseña incorrectos.</p>
+      <button class="f-submit" onclick="doLogin()">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = n => Math.round(n).toLocaleString('es-ES') + ' €';
+const CODES = ['TALLER2026','SALUD-FIN','GLORIA24','SESION2'];
+
+function goTo(id){ const el=$(id); if(el) el.scrollIntoView({behavior:'smooth'}); }
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),3200); }
+
+// SIMULADOR
+function simCalc(){
+  const g=+$('sG').value, p=+$('sP').value, o=+$('sO').value;
+  const anos=+$('sA').value, acu=+$('sK').value, r=+$('sR').value;
+  $('sGV').textContent=fmt(g); $('sPV').textContent=fmt(p); $('sOV').textContent=fmt(o);
+  $('sAV').textContent=anos+' año'+(anos===1?'':'s');
+  $('sKV').textContent=acu===0?'0 €':fmt(acu);
+  $('sRV').textContent=r+'%';
+  const ing=p+o, gap=Math.max(0,g-ing);
+  const gapA=gap*12, obj=gapA/0.8;
+  const capNec=obj/(r/100);
+  const pen=Math.max(0,capNec-acu);
+  const rm=r/100/12, n=anos*12;
+  const fvAcu=acu*Math.pow(1+rm,n);
+  const rest=Math.max(0,capNec-fvAcu);
+  const pmt=rest>0&&n>0?rest*rm/(Math.pow(1+rm,n)-1):0;
+  const totalAp=pmt*n, mer=Math.max(0,capNec-totalAp-acu);
+  const pct=capNec>0?Math.round((mer/capNec)*100):0;
+  $('rGap').textContent=fmt(gap); $('rIng').textContent=fmt(ing)+'/mes';
+  $('rGapA').textContent=fmt(gapA); $('rObj').textContent=fmt(obj);
+  $('rRl').textContent=r+'%'; $('rCap').textContent=fmt(capNec);
+  $('rAcu').textContent=fmt(acu); $('rPen').textContent=fmt(pen);
+  $('rAp').textContent=pmt<1?'0 € (ya tienes suficiente)':fmt(pmt)+'/mes';
+  $('rTA').textContent=fmt(totalAp); $('rMer').textContent=fmt(mer);
+  $('rPct').textContent=pct+'%';
+}
+function simSaveData(){
+  const d={gap:$('rGap').textContent, cap:$('rCap').textContent, ap:$('rAp').textContent};
+  localStorage.setItem('tsf_profile',JSON.stringify(d));
+  loadProfile(); toast('✓ Números guardados');
+}
+function loadProfile(){
+  const d=JSON.parse(localStorage.getItem('tsf_profile')||'{}');
+  if(d.gap){ $('pwG').textContent=d.gap.replace(' €',''); $('pwC').textContent=d.cap.replace(' €',''); $('pwA').textContent=(d.ap||'–').replace(' €/mes','').replace(' €',''); }
+}
+
+// TEMAS
+function initTemas(){
+  document.querySelectorAll('.tema-btn').forEach(btn=>{
+    btn.addEventListener('click',function(e){
+      if(e.target.tagName==='A') return;
+      const isOpen=this.classList.contains('open');
+      document.querySelectorAll('.tema-btn').forEach(b=>b.classList.remove('open'));
+      if(!isOpen) this.classList.add('open');
+    });
+  });
+}
+
+// FAQ
+function toggleFaq(btn){ const item=btn.parentElement; const isOpen=item.classList.contains('open'); document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open')); if(!isOpen) item.classList.add('open'); }
+
+// AUTH
+function openAuth(tab){ $('overlay').classList.add('on'); switchAuth(tab==='login'?'login':'register'); }
+function closeAuth(){ $('overlay').classList.remove('on'); }
+function overlayClick(e){ if(e.target.id==='overlay') closeAuth(); }
+function switchAuth(tab){
+  const r=tab==='register';
+  $('tabR').classList.toggle('on',r); $('fR').classList.toggle('on',r);
+  $('tabL').classList.toggle('on',!r); $('fL').classList.toggle('on',!r);
+}
+function doRegister(){
+  const name=$('rName').value.trim(), email=$('rEmail').value.trim(), pass=$('rPass').value;
+  const err=$('rErr');
+  if(!name||!email||pass.length<6){err.textContent='Por favor completa todos los campos.';err.classList.add('on');return;}
+  err.classList.remove('on');
+  const users=JSON.parse(localStorage.getItem('tsf_users')||'[]');
+  if(users.find(u=>u.email===email)){err.textContent='Este correo ya está registrado.';err.classList.add('on');return;}
+  users.push({name,email,pass});
+  localStorage.setItem('tsf_users',JSON.stringify(users));
+  loginUser(name,email,true); closeAuth(); toast('¡Bienvenida, '+name+'! 🌿');
+}
+function doLogin(){
+  const email=$('lEmail').value.trim(), pass=$('lPass').value;
+  const users=JSON.parse(localStorage.getItem('tsf_users')||'[]');
+  const user=users.find(u=>u.email===email&&u.pass===pass);
+  if(!user){$('lErr').classList.add('on');return;}
+  $('lErr').classList.remove('on');
+  loginUser(user.name,user.email,true); closeAuth(); toast('¡Bienvenida de nuevo, '+user.name+'!');
+}
+function loginUser(name,email,persist){
+  if(persist) localStorage.setItem('tsf_user',JSON.stringify({name,email}));
+  $('ubar').classList.add('on'); $('ubarName').textContent=name;
+  $('navCta').textContent='Mi perfil'; $('navCta').onclick=()=>goTo('sec-sim');
+  $('sociasGate').style.display='none'; $('sociasContent').classList.add('on');
+  $('simSave').classList.add('on'); $('profileWidget').classList.add('on');
+  loadProfile();
+  if(localStorage.getItem('tsf_priv')==='1'){ $('privGate').style.display='none'; $('privContent').classList.add('on'); loadReflexiones(); }
+}
+function doLogout(){
+  localStorage.removeItem('tsf_user');
+  $('ubar').classList.remove('on'); $('navCta').textContent='Unirme'; $('navCta').onclick=()=>openAuth('register');
+  $('sociasGate').style.display='block'; $('sociasContent').classList.remove('on');
+  $('simSave').classList.remove('on'); $('profileWidget').classList.remove('on');
+  toast('Sesión cerrada');
+}
+
+// CÓDIGO PRIVADO
+function activarCodigo(){
+  const code=$('privCode').value.trim().toUpperCase();
+  if(!CODES.includes(code)){$('privErr').style.display='block';return;}
+  $('privErr').style.display='none';
+  localStorage.setItem('tsf_priv','1');
+  $('privGate').style.display='none'; $('privContent').classList.add('on');
+  loadReflexiones(); toast('✓ Acceso privado activado');
+}
+
+// REFLEXIONES
+function saveReflex(){
+  const txt=$('reflexText').value.trim(); if(!txt) return;
+  const list=JSON.parse(localStorage.getItem('tsf_reflex')||'[]');
+  list.unshift({text:txt,date:new Date().toLocaleDateString('es-ES')});
+  localStorage.setItem('tsf_reflex',JSON.stringify(list));
+  $('reflexText').value=''; loadReflexiones(); toast('✓ Reflexión guardada');
+}
+function savePregunta(){
+  const txt=$('pregText').value.trim(); if(!txt) return;
+  $('pregText').value=''; toast('✓ Pregunta guardada — Gloria la verá pronto');
+}
+function loadReflexiones(){
+  const list=JSON.parse(localStorage.getItem('tsf_reflex')||'[]');
+  const el=$('reflexList');
+  if(!list.length){el.textContent='Todavía no has guardado ninguna reflexión.';el.style.fontStyle='italic';el.style.color='var(--ink3)';return;}
+  el.style.fontStyle='normal';el.style.color='var(--ink)';
+  el.innerHTML=list.map(r=>`<div class="reflex-entry"><div class="reflex-date">${r.date}</div><div class="reflex-text">${r.text}</div></div>`).join('');
+}
+
+// INIT
+window.addEventListener('DOMContentLoaded',()=>{
+  simCalc(); initTemas();
+  const saved=localStorage.getItem('tsf_user');
+  if(saved){ const u=JSON.parse(saved); loginUser(u.name,u.email,false); }
+});
+</script>
+</body>
+</html>
