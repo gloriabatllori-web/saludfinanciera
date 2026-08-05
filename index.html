@@ -822,10 +822,17 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 const fmt = n => Math.round(n).toLocaleString('es-ES') + ' €';
+const numFmt = n => Math.round(n).toLocaleString('es-ES');
+const escapeHtml = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const CODES = ['TALLER2026','SALUD-FIN','GLORIA24','SESION2'];
+
+const sb = supabase.createClient('https://ivghraxynsgdeohzufgb.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2Z2hyYXh5bnNnZGVvaHp1ZmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5MTYzNDQsImV4cCI6MjEwMTQ5MjM0NH0.PU8AsTQYfjKFTYDZT5iNXeKQm6MTBrqdasIvU-OFhME');
+let currentUser = null;
+let lastCalc = {gap:0, cap:0, ap:0};
 
 function goTo(id){ const el=$(id); if(el) el.scrollIntoView({behavior:'smooth'}); }
 function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),3200); }
@@ -848,6 +855,7 @@ function simCalc(){
   const pmt=rest>0&&n>0?rest*rm/(Math.pow(1+rm,n)-1):0;
   const totalAp=pmt*n, mer=Math.max(0,capNec-totalAp-acu);
   const pct=capNec>0?Math.round((mer/capNec)*100):0;
+  lastCalc={gap,cap:capNec,ap:pmt};
   $('rGap').textContent=fmt(gap); $('rIng').textContent=fmt(ing)+'/mes';
   $('rGapA').textContent=fmt(gapA); $('rObj').textContent=fmt(obj);
   $('rRl').textContent=r+'%'; $('rCap').textContent=fmt(capNec);
@@ -856,14 +864,23 @@ function simCalc(){
   $('rTA').textContent=fmt(totalAp); $('rMer').textContent=fmt(mer);
   $('rPct').textContent=pct+'%';
 }
-function simSaveData(){
-  const d={gap:$('rGap').textContent, cap:$('rCap').textContent, ap:$('rAp').textContent};
-  localStorage.setItem('tsf_profile',JSON.stringify(d));
+async function simSaveData(){
+  if(!currentUser){ toast('Regístrate o inicia sesión para guardar tus números'); openAuth('register'); return; }
+  const {error}=await sb.from('profiles').upsert({
+    user_id:currentUser.id,
+    gap_mensual:lastCalc.gap,
+    capital_objetivo:lastCalc.cap,
+    aportacion_mensual:lastCalc.ap,
+    updated_at:new Date().toISOString()
+  });
+  if(error){ toast('Error al guardar: '+error.message); return; }
   loadProfile(); toast('✓ Números guardados');
 }
-function loadProfile(){
-  const d=JSON.parse(localStorage.getItem('tsf_profile')||'{}');
-  if(d.gap){ $('pwG').textContent=d.gap.replace(' €',''); $('pwC').textContent=d.cap.replace(' €',''); $('pwA').textContent=(d.ap||'–').replace(' €/mes','').replace(' €',''); }
+async function loadProfile(){
+  if(!currentUser) return;
+  const {data,error}=await sb.from('profiles').select('*').eq('user_id',currentUser.id).maybeSingle();
+  if(error||!data) return;
+  $('pwG').textContent=numFmt(data.gap_mensual); $('pwC').textContent=numFmt(data.capital_objetivo); $('pwA').textContent=numFmt(data.aportacion_mensual);
 }
 
 // TEMAS
@@ -890,39 +907,43 @@ function switchAuth(tab){
   $('tabR').classList.toggle('on',r); $('fR').classList.toggle('on',r);
   $('tabL').classList.toggle('on',!r); $('fL').classList.toggle('on',!r);
 }
-function doRegister(){
+async function doRegister(){
   const name=$('rName').value.trim(), email=$('rEmail').value.trim(), pass=$('rPass').value;
   const err=$('rErr');
   if(!name||!email||pass.length<6){err.textContent='Por favor completa todos los campos.';err.classList.add('on');return;}
   err.classList.remove('on');
-  const users=JSON.parse(localStorage.getItem('tsf_users')||'[]');
-  if(users.find(u=>u.email===email)){err.textContent='Este correo ya está registrado.';err.classList.add('on');return;}
-  users.push({name,email,pass});
-  localStorage.setItem('tsf_users',JSON.stringify(users));
-  loginUser(name,email,true); closeAuth(); toast('¡Bienvenida, '+name+'! 🌿');
+  const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{name}}});
+  if(error){ err.textContent=error.message; err.classList.add('on'); return; }
+  if(data.user && !data.session){ closeAuth(); toast('Revisa tu correo para confirmar tu cuenta ✉️'); }
 }
-function doLogin(){
+async function doLogin(){
   const email=$('lEmail').value.trim(), pass=$('lPass').value;
-  const users=JSON.parse(localStorage.getItem('tsf_users')||'[]');
-  const user=users.find(u=>u.email===email&&u.pass===pass);
-  if(!user){$('lErr').classList.add('on');return;}
+  const {error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error){ $('lErr').textContent=error.message; $('lErr').classList.add('on'); return; }
   $('lErr').classList.remove('on');
-  loginUser(user.name,user.email,true); closeAuth(); toast('¡Bienvenida de nuevo, '+user.name+'!');
 }
-function loginUser(name,email,persist){
-  if(persist) localStorage.setItem('tsf_user',JSON.stringify({name,email}));
-  $('ubar').classList.add('on'); $('ubarName').textContent=name;
-  $('navCta').textContent='Mi perfil'; $('navCta').onclick=()=>goTo('sec-sim');
-  $('sociasGate').style.display='none'; $('sociasContent').classList.add('on');
-  $('simSave').classList.add('on'); $('profileWidget').classList.add('on');
-  loadProfile();
-  if(localStorage.getItem('tsf_priv')==='1'){ $('privGate').style.display='none'; $('privContent').classList.add('on'); loadReflexiones(); }
+function updateUIForAuth(user){
+  currentUser=user;
+  if(user){
+    const name=user.user_metadata?.name||user.email;
+    $('ubar').classList.add('on'); $('ubarName').textContent=name;
+    $('navCta').textContent='Mi perfil'; $('navCta').onclick=()=>goTo('sec-sim');
+    $('sociasGate').style.display='none'; $('sociasContent').classList.add('on');
+    $('simSave').classList.add('on'); $('profileWidget').classList.add('on');
+    loadProfile();
+    if(localStorage.getItem('tsf_priv')==='1'){ $('privGate').style.display='none'; $('privContent').classList.add('on'); loadReflexiones(); }
+  } else {
+    $('ubar').classList.remove('on'); $('navCta').textContent='Unirme'; $('navCta').onclick=()=>openAuth('register');
+    $('sociasGate').style.display='block'; $('sociasContent').classList.remove('on');
+    $('simSave').classList.remove('on'); $('profileWidget').classList.remove('on');
+  }
 }
+sb.auth.onAuthStateChange((event,session)=>{
+  updateUIForAuth(session?.user||null);
+  if(event==='SIGNED_IN'){ closeAuth(); toast('¡Bienvenida, '+(session.user.user_metadata?.name||session.user.email)+'! 🌿'); }
+});
 function doLogout(){
-  localStorage.removeItem('tsf_user');
-  $('ubar').classList.remove('on'); $('navCta').textContent='Unirme'; $('navCta').onclick=()=>openAuth('register');
-  $('sociasGate').style.display='block'; $('sociasContent').classList.remove('on');
-  $('simSave').classList.remove('on'); $('profileWidget').classList.remove('on');
+  sb.auth.signOut();
   toast('Sesión cerrada');
 }
 
@@ -937,30 +958,29 @@ function activarCodigo(){
 }
 
 // REFLEXIONES
-function saveReflex(){
+async function saveReflex(){
+  if(!currentUser){ toast('Regístrate o inicia sesión para guardar tu reflexión'); openAuth('register'); return; }
   const txt=$('reflexText').value.trim(); if(!txt) return;
-  const list=JSON.parse(localStorage.getItem('tsf_reflex')||'[]');
-  list.unshift({text:txt,date:new Date().toLocaleDateString('es-ES')});
-  localStorage.setItem('tsf_reflex',JSON.stringify(list));
+  const {error}=await sb.from('reflexiones').insert({user_id:currentUser.id,text:txt});
+  if(error){ toast('Error al guardar: '+error.message); return; }
   $('reflexText').value=''; loadReflexiones(); toast('✓ Reflexión guardada');
 }
 function savePregunta(){
   const txt=$('pregText').value.trim(); if(!txt) return;
   $('pregText').value=''; toast('✓ Pregunta guardada — Gloria la verá pronto');
 }
-function loadReflexiones(){
-  const list=JSON.parse(localStorage.getItem('tsf_reflex')||'[]');
+async function loadReflexiones(){
+  if(!currentUser) return;
+  const {data,error}=await sb.from('reflexiones').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
   const el=$('reflexList');
-  if(!list.length){el.textContent='Todavía no has guardado ninguna reflexión.';el.style.fontStyle='italic';el.style.color='var(--ink3)';return;}
+  if(error||!data||!data.length){el.textContent='Todavía no has guardado ninguna reflexión.';el.style.fontStyle='italic';el.style.color='var(--ink3)';return;}
   el.style.fontStyle='normal';el.style.color='var(--ink)';
-  el.innerHTML=list.map(r=>`<div class="reflex-entry"><div class="reflex-date">${r.date}</div><div class="reflex-text">${r.text}</div></div>`).join('');
+  el.innerHTML=data.map(r=>`<div class="reflex-entry"><div class="reflex-date">${new Date(r.created_at).toLocaleDateString('es-ES')}</div><div class="reflex-text">${escapeHtml(r.text)}</div></div>`).join('');
 }
 
 // INIT
 window.addEventListener('DOMContentLoaded',()=>{
   simCalc(); initTemas();
-  const saved=localStorage.getItem('tsf_user');
-  if(saved){ const u=JSON.parse(saved); loginUser(u.name,u.email,false); }
 });
 </script>
 </body>
