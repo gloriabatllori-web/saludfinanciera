@@ -57,24 +57,29 @@ create table if not exists public.preguntas (
 
 alter table public.preguntas enable row level security;
 
+drop policy if exists "Users can view own preguntas" on public.preguntas;
 create policy "Users can view own preguntas"
   on public.preguntas for select
   using (auth.uid() = user_id);
 
+drop policy if exists "Users can insert own preguntas" on public.preguntas;
 create policy "Users can insert own preguntas"
   on public.preguntas for insert
   with check (auth.uid() = user_id);
 
 -- Panel de administración: Gloria ve todo y puede contestar preguntas.
 -- Identificación por email (sin rol/tabla de admins separada) porque es la única cuenta que lo necesita.
+drop policy if exists "Admin can view all preguntas" on public.preguntas;
 create policy "Admin can view all preguntas"
   on public.preguntas for select
   using (auth.jwt() ->> 'email' = 'gloriabatllori@gmail.com');
 
+drop policy if exists "Admin can update preguntas" on public.preguntas;
 create policy "Admin can update preguntas"
   on public.preguntas for update
   using (auth.jwt() ->> 'email' = 'gloriabatllori@gmail.com');
 
+drop policy if exists "Admin can view all reflexiones" on public.reflexiones;
 create policy "Admin can view all reflexiones"
   on public.reflexiones for select
   using (auth.jwt() ->> 'email' = 'gloriabatllori@gmail.com');
