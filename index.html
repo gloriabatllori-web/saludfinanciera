@@ -276,6 +276,13 @@ a{color:inherit;text-decoration:none}
 .reflex-entry{margin-bottom:12px;padding:12px 14px;background:var(--g25);border-radius:var(--r-sm);border-left:3px solid var(--g300)}
 .reflex-date{font-size:11px;color:var(--ink3);margin-bottom:4px}
 .reflex-text{font-size:13px;color:var(--ink2);line-height:1.6}
+.adm-item{margin-bottom:14px;padding:14px 16px;background:var(--g25);border-radius:var(--r-sm);border-left:3px solid var(--g300)}
+.adm-item.answered{border-left-color:var(--g700)}
+.adm-meta{font-size:11px;color:var(--ink3);margin-bottom:6px}
+.adm-text{font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:10px}
+.adm-reply{width:100%;border:1.5px solid var(--border2);border-radius:var(--r-sm);padding:10px 12px;font-size:13px;min-height:60px;resize:vertical;outline:none;line-height:1.5;color:var(--ink);margin-bottom:8px}
+.adm-badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:20px;background:var(--g700);color:#fff;margin-left:8px}
+.adm-answer{font-size:13px;color:var(--ink2);line-height:1.6;padding-top:8px;margin-top:8px;border-top:1px dashed var(--border)}
 
 /* AUTH MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(4,46,34,.45);z-index:300;align-items:center;justify-content:center;padding:24px}
@@ -360,6 +367,7 @@ a{color:inherit;text-decoration:none}
       <button class="nav-link" onclick="goTo('sec-sim')">Simulador</button>
       <button class="nav-link" onclick="goTo('sec-socias')">Socias</button>
       <button class="nav-link" onclick="goTo('sec-privada')">Zona privada</button>
+      <button class="nav-link" id="navAdminLink" style="display:none" onclick="goTo('sec-admin')">Admin</button>
       <button class="nav-cta" id="navCta" onclick="openAuth('register')">Unirme</button>
     </div>
   </div>
@@ -755,6 +763,7 @@ a{color:inherit;text-decoration:none}
           <p>Algo de tu situación concreta que quieras consultar en el contexto del taller.</p>
           <textarea id="pregText" placeholder="Tu pregunta..."></textarea>
           <button class="priv-save" onclick="savePregunta()">Enviar pregunta</button>
+          <div id="pregList" style="margin-top:16px"></div>
         </div>
       </div>
       <div class="priv-historial">
@@ -762,6 +771,27 @@ a{color:inherit;text-decoration:none}
         <p>Todo lo que has ido anotando a lo largo del taller.</p>
         <div id="reflexList" style="font-size:13px;color:var(--ink3);font-style:italic">Todavía no has guardado ninguna reflexión.</div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ADMIN (solo visible para Gloria) -->
+<section class="sec" id="sec-admin" style="display:none">
+  <div class="wrap">
+    <div style="margin-bottom:32px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g500);margin-bottom:14px">Panel de administración</div>
+      <h2 style="font-family:var(--serif);font-size:clamp(28px,4vw,42px);font-weight:300;line-height:1.15;letter-spacing:-.02em;margin-bottom:14px">Preguntas y <em style="font-style:italic;color:var(--g700)">reflexiones</em></h2>
+      <p style="font-size:16px;color:var(--ink2);line-height:1.75;max-width:560px">Solo tú ves esta sección — se activa automáticamente al iniciar sesión con tu cuenta.</p>
+    </div>
+    <div class="priv-historial">
+      <h4>Preguntas de las participantes</h4>
+      <p>Escribe tu respuesta y pulsa "Responder" — la participante la verá en su zona privada.</p>
+      <div id="adminPreguntas" style="font-size:13px;color:var(--ink3);font-style:italic">Cargando…</div>
+    </div>
+    <div class="priv-historial">
+      <h4>Todas las reflexiones</h4>
+      <p>Vista de solo lectura.</p>
+      <div id="adminReflexiones" style="font-size:13px;color:var(--ink3);font-style:italic">Cargando…</div>
     </div>
   </div>
 </section>
@@ -831,6 +861,7 @@ const fmt = n => Math.round(n).toLocaleString('es-ES') + ' €';
 const numFmt = n => Math.round(n).toLocaleString('es-ES');
 const escapeHtml = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const CODES = ['TALLER2026','SALUD-FIN','GLORIA24','SESION2'];
+const ADMIN_EMAIL = 'gloriabatllori@gmail.com';
 
 const sb = supabase.createClient('https://ivghraxynsgdeohzufgb.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2Z2hyYXh5bnNnZGVvaHp1ZmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5MTYzNDQsImV4cCI6MjEwMTQ5MjM0NH0.PU8AsTQYfjKFTYDZT5iNXeKQm6MTBrqdasIvU-OFhME');
 let currentUser = null;
@@ -933,11 +964,17 @@ function updateUIForAuth(user){
     $('sociasGate').style.display='none'; $('sociasContent').classList.add('on');
     $('simSave').classList.add('on'); $('profileWidget').classList.add('on');
     loadProfile();
-    if(localStorage.getItem('tsf_priv')==='1'){ $('privGate').style.display='none'; $('privContent').classList.add('on'); loadReflexiones(); }
+    if(localStorage.getItem('tsf_priv')==='1'){ $('privGate').style.display='none'; $('privContent').classList.add('on'); loadReflexiones(); loadPreguntas(); }
+    const isAdmin=user.email===ADMIN_EMAIL;
+    $('navAdminLink').style.display=isAdmin?'':'none';
+    $('sec-admin').style.display=isAdmin?'block':'none';
+    if(isAdmin) loadAdmin();
   } else {
     $('ubar').classList.remove('on'); $('navCta').textContent='Unirme'; $('navCta').onclick=()=>openAuth('register');
     $('sociasGate').style.display='block'; $('sociasContent').classList.remove('on');
     $('simSave').classList.remove('on'); $('profileWidget').classList.remove('on');
+    $('navAdminLink').style.display='none';
+    $('sec-admin').style.display='none';
   }
 }
 sb.auth.onAuthStateChange((event,session)=>{
@@ -963,13 +1000,18 @@ function activarCodigo(){
 async function saveReflex(){
   if(!currentUser){ toast('Regístrate o inicia sesión para guardar tu reflexión'); openAuth('register'); return; }
   const txt=$('reflexText').value.trim(); if(!txt) return;
-  const {error}=await sb.from('reflexiones').insert({user_id:currentUser.id,text:txt});
+  const name=currentUser.user_metadata?.name||currentUser.email;
+  const {error}=await sb.from('reflexiones').insert({user_id:currentUser.id,user_name:name,user_email:currentUser.email,text:txt});
   if(error){ toast('Error al guardar: '+error.message); return; }
   $('reflexText').value=''; loadReflexiones(); toast('✓ Reflexión guardada');
 }
-function savePregunta(){
+async function savePregunta(){
+  if(!currentUser){ toast('Regístrate o inicia sesión para enviar tu pregunta'); openAuth('register'); return; }
   const txt=$('pregText').value.trim(); if(!txt) return;
-  $('pregText').value=''; toast('✓ Pregunta guardada — Gloria la verá pronto');
+  const name=currentUser.user_metadata?.name||currentUser.email;
+  const {error}=await sb.from('preguntas').insert({user_id:currentUser.id,user_name:name,user_email:currentUser.email,text:txt});
+  if(error){ toast('Error al guardar: '+error.message); return; }
+  $('pregText').value=''; loadPreguntas(); toast('✓ Pregunta enviada — Gloria la verá pronto');
 }
 async function loadReflexiones(){
   if(!currentUser) return;
@@ -978,6 +1020,45 @@ async function loadReflexiones(){
   if(error||!data||!data.length){el.textContent='Todavía no has guardado ninguna reflexión.';el.style.fontStyle='italic';el.style.color='var(--ink3)';return;}
   el.style.fontStyle='normal';el.style.color='var(--ink)';
   el.innerHTML=data.map(r=>`<div class="reflex-entry"><div class="reflex-date">${new Date(r.created_at).toLocaleDateString('es-ES')}</div><div class="reflex-text">${escapeHtml(r.text)}</div></div>`).join('');
+}
+async function loadPreguntas(){
+  if(!currentUser) return;
+  const {data,error}=await sb.from('preguntas').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  const el=$('pregList');
+  if(error||!data||!data.length){el.innerHTML='';return;}
+  el.innerHTML=data.map(p=>`<div class="reflex-entry"><div class="reflex-date">${new Date(p.created_at).toLocaleDateString('es-ES')}${p.respondida?' <span class="adm-badge">Respondida</span>':''}</div><div class="reflex-text">${escapeHtml(p.text)}</div>${p.respondida?`<div class="adm-answer">${escapeHtml(p.respuesta)}</div>`:''}</div>`).join('');
+}
+
+// ADMIN
+async function loadAdmin(){ loadAdminPreguntas(); loadAdminReflexiones(); }
+async function loadAdminPreguntas(){
+  const {data,error}=await sb.from('preguntas').select('*').order('created_at',{ascending:false});
+  const el=$('adminPreguntas');
+  if(error){ el.textContent='Error al cargar: '+error.message; return; }
+  if(!data||!data.length){ el.textContent='Todavía no hay preguntas.'; el.style.fontStyle='italic'; el.style.color='var(--ink3)'; return; }
+  el.style.fontStyle='normal'; el.style.color='var(--ink)';
+  el.innerHTML=data.map(p=>`
+    <div class="adm-item${p.respondida?' answered':''}">
+      <div class="adm-meta">${escapeHtml(p.user_name||p.user_email||'—')} · ${new Date(p.created_at).toLocaleDateString('es-ES')}${p.respondida?' <span class="adm-badge">Respondida</span>':''}</div>
+      <div class="adm-text">${escapeHtml(p.text)}</div>
+      ${p.respondida
+        ? `<div class="adm-answer">${escapeHtml(p.respuesta)}</div>`
+        : `<textarea class="adm-reply" id="reply-${p.id}" placeholder="Escribe tu respuesta..."></textarea><button class="priv-save" onclick="answerPregunta(${p.id})">Responder</button>`}
+    </div>`).join('');
+}
+async function loadAdminReflexiones(){
+  const {data,error}=await sb.from('reflexiones').select('*').order('created_at',{ascending:false});
+  const el=$('adminReflexiones');
+  if(error){ el.textContent='Error al cargar: '+error.message; return; }
+  if(!data||!data.length){ el.textContent='Todavía no hay reflexiones.'; el.style.fontStyle='italic'; el.style.color='var(--ink3)'; return; }
+  el.style.fontStyle='normal'; el.style.color='var(--ink)';
+  el.innerHTML=data.map(r=>`<div class="adm-item"><div class="adm-meta">${escapeHtml(r.user_name||r.user_email||'—')} · ${new Date(r.created_at).toLocaleDateString('es-ES')}</div><div class="adm-text">${escapeHtml(r.text)}</div></div>`).join('');
+}
+async function answerPregunta(id){
+  const box=$('reply-'+id); const respuesta=box.value.trim(); if(!respuesta) return;
+  const {error}=await sb.from('preguntas').update({respuesta,respondida:true,answered_at:new Date().toISOString()}).eq('id',id);
+  if(error){ toast('Error al responder: '+error.message); return; }
+  loadAdminPreguntas(); toast('✓ Respuesta enviada');
 }
 
 // INIT

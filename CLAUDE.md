@@ -11,6 +11,7 @@ Es el sitio web del negocio de Gloria: imparte un **taller presencial de educaci
 3. **Dar servicio a quien ya pasó por el taller presencial** — dos zonas con acceso restringido:
    - **Zona de socias** (requiere cuenta): sesiones, materiales, ejercicios, grupo de WhatsApp — para quien se registra online.
    - **Zona privada** (requiere código personal que Gloria entrega en mano): espacio individual para reflexiones semanales y preguntas directas a Gloria, seguimiento de la evolución de cada participante.
+   - **Panel de administración** (solo Gloria): ve todas las reflexiones y preguntas de todas las participantes y contesta directamente desde ahí.
 
 El registro/login (Supabase) existe para que cada participante guarde sus propios números del simulador y sus reflexiones de forma persistente y privada entre sesiones — antes de conectar Supabase, todo esto vivía solo en el `localStorage` del navegador (se perdía al cambiar de dispositivo o borrar caché).
 
@@ -22,16 +23,19 @@ Página única (`index.html`, vanilla HTML/CSS/JS, sin build ni framework) con:
 - Registro/login real de usuarias (Supabase Auth)
 - Zona de "socias" (contenido del taller, gate por login)
 - Zona privada por código personal (gate independiente del login, usa `CODES` hardcodeado en el JS — no tiene relación con Supabase)
+- Panel de administración: sección `sec-admin`, oculta salvo que el email de la sesión coincida con `ADMIN_EMAIL` (hardcodeado en el JS, es el email de Gloria) — no hay login ni contraseña separados, se activa solo con su cuenta normal
 
 ## Stack
 
 - **Frontend**: un solo `index.html`, sin build step. Se puede abrir directo o servir con `python3 -m http.server`.
 - **Backend**: Supabase (proyecto `ivghraxynsgdeohzufgb`)
   - Auth: email/password real vía `supabase-js` (CDN, `@supabase/supabase-js@2`)
-  - DB: Postgres con RLS, dos tablas — ver [supabase/schema.sql](supabase/schema.sql)
+  - DB: Postgres con RLS, tres tablas — ver [supabase/schema.sql](supabase/schema.sql)
     - `profiles` (user_id, gap_mensual, capital_objetivo, aportacion_mensual) — números del simulador
-    - `reflexiones` (user_id, text, created_at) — reflexiones de la zona privada
-  - Ambas tablas con RLS: cada usuaria solo ve/edita sus propias filas
+    - `reflexiones` (user_id, user_name, user_email, text, created_at) — reflexiones de la zona privada
+    - `preguntas` (user_id, user_name, user_email, text, respuesta, respondida, created_at, answered_at) — preguntas a Gloria y sus respuestas
+  - Todas con RLS: cada usuaria solo ve/edita sus propias filas; además hay políticas SELECT/UPDATE extra en `reflexiones` y `preguntas` que dan acceso de lectura total (y de respuesta, en `preguntas`) a quien tenga el email de Gloria (`auth.jwt() ->> 'email' = 'gloriabatllori@gmail.com'`) — así funciona el panel de admin
+  - `user_name`/`user_email` están denormalizados en cada fila (copiados desde `currentUser` al insertar) para que el panel de admin pueda mostrar de quién es cada entrada sin tener que leer `auth.users`, que el cliente anon no puede consultar
   - El cliente de Supabase (URL + anon key) está hardcodeado directamente en `index.html` — es normal y seguro, la anon key es pública por diseño
 - **Hosting**: Vercel, despliegue automático en cada push a `main`
   - URL producción: https://saludfinanciera-sooty.vercel.app
@@ -41,7 +45,7 @@ Página única (`index.html`, vanilla HTML/CSS/JS, sin build ni framework) con:
 ## Cosas a tener en cuenta
 
 - **Supabase Auth → URL Configuration → Site URL** debe apuntar a `https://saludfinanciera-sooty.vercel.app` (no a localhost). Si esto se resetea o cambia el dominio de Vercel, los enlaces de confirmación de email se rompen (llevan a localhost y dan `ERR_CONNECTION_REFUSED`) — aunque ojo, la cuenta **sí queda confirmada igualmente** en el servidor de Supabase, solo falla la redirección final visual.
-- `savePregunta()` (el formulario "Pregunta para Gloria") es solo un toast de UI — no persiste en ningún sitio todavía. Quedó fuera de alcance cuando se conectó Supabase (solo se pidió auth + perfil + reflexiones).
+- El email de Gloria está hardcodeado como `ADMIN_EMAIL` en el JS y también dentro de las políticas RLS de `supabase/schema.sql`. Si cambia de email algún día, hay que actualizarlo en los dos sitios.
 - Cuentas de prueba creadas durante QA (usando el alias `+algo` del email de Gloria, así que llegan a su propia bandeja): `gloriabatllori+supabasetest1@gmail.com`, `+supabaselive1@gmail.com`, `+supabasetest2@gmail.com`. Se pueden borrar desde Supabase → Authentication → Users si se quiere limpiar.
 
 ## Flujo de cambios
